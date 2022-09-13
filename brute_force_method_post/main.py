@@ -1,33 +1,40 @@
+import requests
 import time
-from itertools import product
+from itertools import product, permutations
 from sys import getsizeof
 
-import requests
 
 endpoint = 'https://www.binance.com/bapi/fiat/v1/public/ocbs/get-quote'
-length = 4
-search_word = 'x' * length
-body = {
-    "baseCurrency":"EUR",
-    "cryptoCurrency":"BTC",
-    "payType": "Bid",
-    "paymentChannel":search_word,
-    "rail":"card",
-    "requestedAmount":1000,
-    "requestedCurrency":"EUR"
-}
-headers = {
-            "Content-Type": "application/json",
-            "Content-Length": str(getsizeof(body)),
-        }
+length = 3
 
 
-class brute_force_post_request:
-    def __init__(self, length, endpoint, headers):
+def create_body(search_word):
+    return {
+        "baseCurrency": "EUR",
+        "cryptoCurrency": "BTC",
+        "payType": "Bid",
+        "paymentChannel": search_word,
+        "rail": "card",
+        "requestedAmount": 1000,
+        "requestedCurrency": "EUR"
+    }
+
+
+def create_headers():
+    search_word = 'x' * length
+    body = create_body(search_word)
+    return {
+        "Content-Type": "application/json",
+        "Content-Length": str(getsizeof(body))
+    }
+
+
+class BruteForcePostRequest:
+    def __init__(self, length, endpoint):
         self.length = length
         self.iterable = 'etaoinshrdlcumwfgypbvkjxqz'
         self.endpoint = endpoint
-        self.headers = headers
+        self.headers = create_headers()
         self.run = True
         self.count_api = 0
 
@@ -44,26 +51,18 @@ class brute_force_post_request:
         else:
             print(f'! = {search_word}')
 
-    def make_body(self, search_word):
-        return {
-            "baseCurrency": "EUR",
-            "cryptoCurrency": "BTC",
-            "payType": "Bid",
-            "paymentChannel": search_word,
-            "rail": "card",
-            "requestedAmount": 1000,
-            "requestedCurrency": "EUR"
-        }
-
     def get_api_answer(self, search_word):
         with requests.session() as session:
+            body = create_body(search_word)
             try:
                 response = session.post(self.endpoint, headers=self.headers,
-                                        json=self.make_body(search_word))
-            except:
+                                        json=body)
+            except BaseException as err:
+                with open('errors.txt', 'w') as f:
+                    print(f'Errors: {err}, search_word = {search_word}', file=f)
                 time.sleep(80)
                 response = session.post(self.endpoint, headers=self.headers,
-                                        json=self.make_body(search_word))
+                                        json=body)
             self.check_answer(response.json(), search_word)
 
     def permutations(self):
@@ -78,12 +77,10 @@ class brute_force_post_request:
 
 
 if __name__ == '__main__':
-    N = 358800
-    a = brute_force_post_request(length, endpoint, headers)
-
+    brute_force = BruteForcePostRequest(length, endpoint)
+    N = len(tuple(permutations(brute_force.iterable, length)))
     start_timestamp = time.time()
-    a.permutations()
-
+    brute_force.permutations()
     task_time = round(time.time() - start_timestamp, 2)
     rps = round(N / task_time, 1)
     print(
