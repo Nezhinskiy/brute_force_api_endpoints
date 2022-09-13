@@ -5,7 +5,7 @@ from sys import getsizeof
 
 
 endpoint = 'https://www.binance.com/bapi/fiat/v1/public/ocbs/get-quote'
-length = 1
+length = 3
 
 
 def create_body(search_word):
