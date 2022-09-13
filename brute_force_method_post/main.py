@@ -5,7 +5,7 @@ from sys import getsizeof
 
 
 endpoint = 'https://www.binance.com/bapi/fiat/v1/public/ocbs/get-quote'
-length = 3
+length = 1
 
 
 def create_body(search_word):
@@ -83,6 +83,8 @@ if __name__ == '__main__':
     brute_force.permutations()
     task_time = round(time.time() - start_timestamp, 2)
     rps = round(N / task_time, 1)
-    print(
-        f"| Requests: {N}; Total time: {task_time} s; RPS: {rps}. |\n"
-    )
+    with open('rps.txt', 'w') as f:
+        print(
+            f"| Requests: {N}; Total time: {task_time} s; RPS: {rps}. |\n",
+            file=f
+        )
