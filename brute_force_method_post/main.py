@@ -57,7 +57,7 @@ class BruteForcePostRequest:
             return
         elif answer['code'] == '000000':
             self.__run = False
-            with open('result.txt', 'w') as f:
+            with open('result.txt', 'a') as f:
                 print(f'Result = {search_word}', file=f)
                 print(f'Result = {search_word}')
         else:
@@ -74,7 +74,7 @@ class BruteForcePostRequest:
                     response = session.post(self.endpoint, headers=self.headers,
                                             json=body)
                 except BaseException as err:
-                    with open('errors.txt', 'w') as f:
+                    with open('errors.txt', 'a') as f:
                         print(f'Errors: {err}, search_word = {search_word}',
                               file=f)
                     time.sleep(80)
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     brute_force.get_api_answer()
     task_time = round(time.time() - start_timestamp, 2)
     rps = round(N / task_time, 1)
-    with open('rps.txt', 'w') as f:
+    with open('rps.txt', 'a') as f:
         print(
             f"| Requests: {N}; Total time: {task_time} s; RPS: {rps}. |\n",
             file=f
