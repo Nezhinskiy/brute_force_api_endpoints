@@ -7,8 +7,8 @@ import requests
 
 endpoint = 'https://www.binance.com/bapi/fiat/v1/public/ocbs/get-quote'
 iterable = 'etaoinshrdlcumwfgypbvkjxqz'
-length = 1
-start_from = 20
+length = 3
+start_from = 0
 good_answer = '000000'
 bad_answer = '000002:参数异常:000002'
 
