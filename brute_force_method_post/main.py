@@ -40,7 +40,8 @@ class BruteForcePostRequest:
 
     def check_answer(self, answer, search_word):
         self.count_api += 1
-        print(self.count_api)
+        with open('runtime.txt', 'w') as f:
+            print(self.count_api, file=f)
         if answer['message'] == '000002:参数异常:000002':
             return
         elif answer['code'] == '000000':
