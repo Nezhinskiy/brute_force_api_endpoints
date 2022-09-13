@@ -1,15 +1,19 @@
-import requests
 import time
-from itertools import product, permutations
+from itertools import permutations, product
 from sys import getsizeof
+from typing import List
 
+import requests
 
 endpoint = 'https://www.binance.com/bapi/fiat/v1/public/ocbs/get-quote'
-length = 3
-start_from = 0
+iterable = 'etaoinshrdlcumwfgypbvkjxqz'
+length = 1
+start_from = 20
+good_answer = '000000'
+bad_answer = '000002:参数异常:000002'
 
 
-def create_body(search_word):
+def create_body(search_word: str) -> dict:
     return {
         "baseCurrency": "EUR",
         "cryptoCurrency": "BTC",
@@ -21,7 +25,7 @@ def create_body(search_word):
     }
 
 
-def create_headers():
+def create_headers() -> dict:
     search_word = 'x' * length
     body = create_body(search_word)
     return {
@@ -30,7 +34,7 @@ def create_headers():
     }
 
 
-def create_permutations_list(iterable, length):
+def create_permutations_list(iterable: str, length: int) -> List[str]:
     permutations_list = []
     pool = tuple(iterable)
     n = len(pool)
@@ -42,20 +46,22 @@ def create_permutations_list(iterable, length):
 
 
 class BruteForcePostRequest:
-    def __init__(self, length, endpoint, start_from=0):
+    def __init__(self):
         self.length = length
-        self.iterable = 'etaoinshrdlcumwfgypbvkjxqz'
+        self.iterable = iterable
         self.endpoint = endpoint
         self.headers = create_headers()
         self.__run = True
-        self.__count_api = start_from
+        self.__count_api = start_from or 0
+        self.good_answer = good_answer
+        self.bad_answer = bad_answer
 
-    def __check_answer(self, answer, search_word):
+    def __check_answer(self, answer: dict, search_word: str) -> None:
         with open('runtime.txt', 'w') as runtime:
-            print(self.__count_api, file=runtime)
-        if answer['message'] == '000002:参数异常:000002':
+            print(self.__count_api, search_word, file=runtime)
+        if answer['message'] == self.bad_answer:
             return
-        elif answer['code'] == '000000':
+        elif answer['code'] == self.good_answer:
             self.__run = False
             with open('result.txt', 'a') as result:
                 print(f'Result = {search_word}', file=result)
@@ -63,7 +69,7 @@ class BruteForcePostRequest:
         else:
             print(f'! = {search_word}')
 
-    def get_api_answer(self):
+    def get_api_answer(self) -> None:
         permutations_list = create_permutations_list(self.iterable, self.length)
         list_size = len(permutations_list)
         while self.__run and self.__count_api < list_size:
@@ -84,15 +90,19 @@ class BruteForcePostRequest:
                 self.__count_api += 1
 
 
-if __name__ == '__main__':
-    brute_force = BruteForcePostRequest(length, endpoint, start_from)
-    N = len(tuple(permutations(brute_force.iterable, length))) - start_from
+def main() -> None:
+    brute_force = BruteForcePostRequest()
+    n = len(tuple(permutations(brute_force.iterable, length))) - start_from
     start_timestamp = time.time()
     brute_force.get_api_answer()
     task_time = round(time.time() - start_timestamp, 2)
-    rps = round(N / task_time, 1)
-    with open('rps.txt', 'a') as rps:
+    rps = round(n / task_time, 1)
+    with open('rps_info.txt', 'a') as rps_info:
         print(
-            f"| Requests: {N}; Total time: {task_time} s; RPS: {rps}. |\n",
-            file=rps
+            f"| Requests: {n}; Total time: {task_time} s; RPS: {rps}. |\n",
+            file=rps_info
         )
+
+
+if __name__ == '__main__':
+    main()
