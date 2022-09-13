@@ -51,14 +51,14 @@ class BruteForcePostRequest:
         self.__count_api = start_from
 
     def __check_answer(self, answer, search_word):
-        with open('runtime.txt', 'w') as f:
-            print(self.__count_api, file=f)
+        with open('runtime.txt', 'w') as runtime:
+            print(self.__count_api, file=runtime)
         if answer['message'] == '000002:参数异常:000002':
             return
         elif answer['code'] == '000000':
             self.__run = False
-            with open('result.txt', 'a') as f:
-                print(f'Result = {search_word}', file=f)
+            with open('result.txt', 'a') as result:
+                print(f'Result = {search_word}', file=result)
                 print(f'Result = {search_word}')
         else:
             print(f'! = {search_word}')
@@ -74,9 +74,9 @@ class BruteForcePostRequest:
                     response = session.post(self.endpoint, headers=self.headers,
                                             json=body)
                 except BaseException as err:
-                    with open('errors.txt', 'a') as f:
+                    with open('errors.txt', 'a') as errors:
                         print(f'Errors: {err}, search_word = {search_word}',
-                              file=f)
+                              file=errors)
                     time.sleep(80)
                     response = session.post(self.endpoint, headers=self.headers,
                                             json=body)
@@ -91,8 +91,8 @@ if __name__ == '__main__':
     brute_force.get_api_answer()
     task_time = round(time.time() - start_timestamp, 2)
     rps = round(N / task_time, 1)
-    with open('rps.txt', 'a') as f:
+    with open('rps.txt', 'a') as rps:
         print(
             f"| Requests: {N}; Total time: {task_time} s; RPS: {rps}. |\n",
-            file=f
+            file=rps
         )
