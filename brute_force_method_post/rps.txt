@@ -1,2 +1,2 @@
-| Requests: 26; Total time: 17.91 s; RPS: 1.5. |
+| Requests: 22; Total time: 11.66 s; RPS: 1.9. |
 
